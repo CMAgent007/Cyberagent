@@ -64,3 +64,15 @@ class ToolRegistry:
 
 
 registry = ToolRegistry()
+
+registry.register(
+    "shell",
+    "tools.shell",
+    "run_command"
+)
+
+registry.register(
+    "python",
+    "tools.python_tool",
+    "run_python_file"
+)

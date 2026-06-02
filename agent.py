@@ -1,45 +1,27 @@
 import requests
-import json
 import re
 
 from memory_manager import remember, recall
-from tool_registry import registry
 from tools.knowledge import search_knowledge
-from tools.file_agent import execute_file_action
 
-registry.register(
-    "shell",
-    "tools.shell",
-    "run_command"
-)
-
-registry.register(
-    "python",
-    "tools.python_tool",
-    "run_python_file"
-)
+from planner import plan
+from router import execute_plan
 
 SERVER_URL = "http://127.0.0.1:8080/completion"
 
 SYSTEM_PROMPT = """
 You are CyberAgent.
 
-If a shell command is required return ONLY JSON.
+Be concise.
 
-Examples:
+Answer clearly.
 
-{"action":"tool","tool":"shell","command":"pwd"}
-
-{"action":"tool","tool":"shell","command":"ls"}
-
-{"action":"tool","tool":"shell","command":"date"}
-
-Otherwise answer normally.
+If you do not need a tool, answer normally.
 """
 
 print("=" * 50)
-print("CyberAgent V12")
-print("Connected to llama-server")
+print("CyberAgent V15")
+print("Planner + Router Architecture")
 print("Type 'exit' to quit")
 print("=" * 50)
 
@@ -55,9 +37,9 @@ while True:
 
     user_lower = user_input.lower()
 
-    # -------------------
-    # MEMORY
-    # -------------------
+    # --------------------
+    # MEMORY STORE
+    # --------------------
 
     match = re.search(
         r"my name is (.+)",
@@ -75,10 +57,14 @@ while True:
         )
 
         print(
-            f"\nAgent:\nNice to meet you, {name}. I will remember that."
+            f"\nAgent:\nNice to meet you, {name}."
         )
 
         continue
+
+    # --------------------
+    # MEMORY RECALL
+    # --------------------
 
     if user_lower in [
         "what is my name",
@@ -101,111 +87,9 @@ while True:
 
         continue
 
-    # -------------------
-    # FILE READ
-    # -------------------
-
-    read_match = re.match(
-        r"read\s+(.+)",
-        user_input,
-        re.IGNORECASE
-    )
-
-    if read_match:
-
-        path = read_match.group(1).strip()
-
-        result = execute_file_action(
-            "read",
-            path
-        )
-
-        print("\nAgent:\n")
-        print(result)
-
-        continue
-
-    # -------------------
-    # FILE WRITE
-    # -------------------
-
-    write_match = re.match(
-        r"write\s+(\S+)\s+(.+)",
-        user_input,
-        re.IGNORECASE
-    )
-
-    if write_match:
-
-        path = write_match.group(1)
-
-        content = write_match.group(2)
-
-        result = execute_file_action(
-            "write",
-            path,
-            content
-        )
-
-        print("\nAgent:\n")
-        print(result)
-
-        continue
-
-    # -------------------
-    # FILE APPEND
-    # -------------------
-
-    append_match = re.match(
-        r"append\s+(\S+)\s+(.+)",
-        user_input,
-        re.IGNORECASE
-    )
-
-    if append_match:
-
-        path = append_match.group(1)
-
-        content = append_match.group(2)
-
-        result = execute_file_action(
-            "append",
-            path,
-            content
-        )
-
-        print("\nAgent:\n")
-        print(result)
-
-        continue
-
-    # -------------------
-    # PYTHON EXECUTION
-    # -------------------
-
-    run_match = re.match(
-        r"run\s+(.+\.py)",
-        user_input,
-        re.IGNORECASE
-    )
-
-    if run_match:
-
-        path = run_match.group(1).strip()
-
-        success, result = registry.execute(
-            "python",
-            path
-        )
-
-        print("\nAgent:\n")
-        print(result)
-
-        continue
-
-    # -------------------
+    # --------------------
     # KNOWLEDGE SEARCH
-    # -------------------
+    # --------------------
 
     knowledge_result = search_knowledge(
         user_input
@@ -218,9 +102,28 @@ while True:
 
         continue
 
-    # -------------------
-    # LLM
-    # -------------------
+    # --------------------
+    # PLANNER
+    # --------------------
+
+    task = plan(
+        user_input
+    )
+
+    if task:
+
+        result = execute_plan(
+            task
+        )
+
+        print("\nAgent:\n")
+        print(result)
+
+        continue
+
+    # --------------------
+    # LLM FALLBACK
+    # --------------------
 
     print("\nThinking...\n")
 
@@ -233,8 +136,8 @@ while True:
                     SYSTEM_PROMPT
                     + "\nUser: "
                     + user_input,
-                "n_predict": 96,
-                "temperature": 0.2,
+                "n_predict": 128,
+                "temperature": 0.3,
                 "stop": ["User:"]
             },
             timeout=120
@@ -244,48 +147,10 @@ while True:
 
         reply = data["content"].strip()
 
+        print("\nAgent:\n")
+        print(reply)
+
     except Exception as e:
 
         print("\nError:")
         print(e)
-
-        continue
-
-    # -------------------
-    # SHELL TOOL JSON
-    # -------------------
-
-    try:
-
-        json_match = re.search(
-            r"\{.*?\}",
-            reply,
-            re.DOTALL
-        )
-
-        if json_match:
-
-            tool_call = json.loads(
-                json_match.group(0)
-            )
-
-            if (
-                tool_call.get("action")
-                == "tool"
-            ):
-
-                success, result = registry.execute(
-                    tool_call["tool"],
-                    tool_call["command"]
-                )
-
-                print("\nAgent:\n")
-                print(result)
-
-                continue
-
-    except Exception:
-        pass
-
-    print("\nAgent:\n")
-    print(reply)
