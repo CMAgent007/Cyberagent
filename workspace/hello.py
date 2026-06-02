@@ -1,1 +1,1 @@
-print("Hello from CyberAgent")
+print("Hello, World!")
