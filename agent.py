@@ -13,12 +13,18 @@ registry.register(
     "run_command"
 )
 
+registry.register(
+    "python",
+    "tools.python_tool",
+    "run_python_file"
+)
+
 SERVER_URL = "http://127.0.0.1:8080/completion"
 
 SYSTEM_PROMPT = """
 You are CyberAgent.
 
-If a shell command is needed return ONLY JSON.
+If a shell command is required return ONLY JSON.
 
 Examples:
 
@@ -32,7 +38,7 @@ Otherwise answer normally.
 """
 
 print("=" * 50)
-print("CyberAgent V11")
+print("CyberAgent V12")
 print("Connected to llama-server")
 print("Type 'exit' to quit")
 print("=" * 50)
@@ -48,6 +54,10 @@ while True:
         break
 
     user_lower = user_input.lower()
+
+    # -------------------
+    # MEMORY
+    # -------------------
 
     match = re.search(
         r"my name is (.+)",
@@ -91,6 +101,10 @@ while True:
 
         continue
 
+    # -------------------
+    # FILE READ
+    # -------------------
+
     read_match = re.match(
         r"read\s+(.+)",
         user_input,
@@ -110,6 +124,10 @@ while True:
         print(result)
 
         continue
+
+    # -------------------
+    # FILE WRITE
+    # -------------------
 
     write_match = re.match(
         r"write\s+(\S+)\s+(.+)",
@@ -134,6 +152,10 @@ while True:
 
         continue
 
+    # -------------------
+    # FILE APPEND
+    # -------------------
+
     append_match = re.match(
         r"append\s+(\S+)\s+(.+)",
         user_input,
@@ -157,6 +179,34 @@ while True:
 
         continue
 
+    # -------------------
+    # PYTHON EXECUTION
+    # -------------------
+
+    run_match = re.match(
+        r"run\s+(.+\.py)",
+        user_input,
+        re.IGNORECASE
+    )
+
+    if run_match:
+
+        path = run_match.group(1).strip()
+
+        success, result = registry.execute(
+            "python",
+            path
+        )
+
+        print("\nAgent:\n")
+        print(result)
+
+        continue
+
+    # -------------------
+    # KNOWLEDGE SEARCH
+    # -------------------
+
     knowledge_result = search_knowledge(
         user_input
     )
@@ -167,6 +217,10 @@ while True:
         print(knowledge_result)
 
         continue
+
+    # -------------------
+    # LLM
+    # -------------------
 
     print("\nThinking...\n")
 
@@ -196,6 +250,10 @@ while True:
         print(e)
 
         continue
+
+    # -------------------
+    # SHELL TOOL JSON
+    # -------------------
 
     try:
 
