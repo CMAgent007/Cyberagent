@@ -1,0 +1,12 @@
+venv/
+__pycache__/
+*.pyc
+
+logs/
+memory/
+
+models/
+
+llama.cpp/build/
+
+*.log
