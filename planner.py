@@ -5,7 +5,9 @@ def plan(user_input):
 
     text = user_input.lower().strip()
 
-    # Shell commands
+    # --------------------
+    # SHELL COMMANDS
+    # --------------------
 
     if (
         "current directory" in text
@@ -37,7 +39,9 @@ def plan(user_input):
             "command": "date"
         }
 
-    # File read
+    # --------------------
+    # FILE READ
+    # --------------------
 
     match = re.match(
         r"read\s+(.+)",
@@ -53,7 +57,9 @@ def plan(user_input):
             "path": match.group(1).strip()
         }
 
-    # File write
+    # --------------------
+    # FILE WRITE
+    # --------------------
 
     match = re.match(
         r"write\s+(\S+)\s+(.+)",
@@ -70,7 +76,9 @@ def plan(user_input):
             "content": match.group(2)
         }
 
-    # File append
+    # --------------------
+    # FILE APPEND
+    # --------------------
 
     match = re.match(
         r"append\s+(\S+)\s+(.+)",
@@ -87,7 +95,9 @@ def plan(user_input):
             "content": match.group(2)
         }
 
-    # Python execution
+    # --------------------
+    # PYTHON EXECUTION
+    # --------------------
 
     match = re.match(
         r"run\s+(.+\.py)",
@@ -99,10 +109,12 @@ def plan(user_input):
 
         return {
             "tool": "python",
-            "path": match.group(1)
+            "path": match.group(1).strip()
         }
 
-    # Script generation
+    # --------------------
+    # SCRIPT GENERATION
+    # --------------------
 
     if (
         "create" in text
@@ -113,5 +125,26 @@ def plan(user_input):
             "tool": "builder",
             "prompt": user_input
         }
+
+    # --------------------
+    # LEARNING TOOL
+    # --------------------
+
+    match = re.match(
+        r"learn\s+(.+)",
+        user_input,
+        re.IGNORECASE
+    )
+
+    if match:
+
+        return {
+            "tool": "learning",
+            "path": match.group(1).strip()
+        }
+
+    # --------------------
+    # NO TOOL FOUND
+    # --------------------
 
     return None

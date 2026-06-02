@@ -7,58 +7,110 @@ SERVER_URL = "http://127.0.0.1:8080/completion"
 def generate_python_code(prompt):
 
     system_prompt = """
-Return ONLY Python code.
+You are a Python code generator.
 
-No explanations.
+Output ONLY executable Python code.
 
-No markdown.
-
-No comments.
-
-Only executable Python.
+Rules:
+- No explanations
+- No markdown
+- No ``` blocks
+- No comments
+- Do not add features not requested
+- Generate the smallest working solution
+- Return Python code only
 """
 
-    response = requests.post(
-        SERVER_URL,
-        json={
-            "prompt":
-                system_prompt
-                + "\nUser: "
-                + prompt,
-            "n_predict": 256,
-            "temperature": 0.1,
-            "stop": ["User:"]
-        },
-        timeout=120
-    )
+    try:
 
-    data = response.json()
+        response = requests.post(
+            SERVER_URL,
+            json={
+                "prompt":
+                    system_prompt
+                    + "\nUser: "
+                    + prompt,
 
-    text = data["content"].strip()
+                "n_predict": 256,
 
-    code_blocks = re.findall(
-        r"```(?:python)?(.*?)```",
-        text,
-        re.DOTALL
-    )
+                "temperature": 0.0,
 
-    if code_blocks:
+                "stop": [
+                    "User:",
+                    "Explanation:",
+                    "Here is"
+                ]
+            },
+            timeout=300
+        )
 
-        return code_blocks[0].strip()
+        data = response.json()
 
-    lines = []
+        print(
+            "DEBUG:",
+            data.get(
+                "stop_type",
+                "unknown"
+            )
+        )
 
-    for line in text.splitlines():
+        text = data["content"].strip()
 
-        line = line.rstrip()
+        # Extract code from markdown blocks
 
-        if (
-            line.startswith("Here is")
-            or line.startswith("Save this")
-            or line.startswith("The following")
-        ):
-            continue
+        code_blocks = re.findall(
+            r"```(?:python)?(.*?)```",
+            text,
+            re.DOTALL
+        )
 
-        lines.append(line)
+        if code_blocks:
 
-    return "\n".join(lines).strip()
+            return code_blocks[0].strip()
+
+        # Remove obvious explanation lines
+
+        cleaned = []
+
+        skip_starts = [
+            "here is",
+            "the following",
+            "this script",
+            "example:",
+            "save this",
+            "output:"
+        ]
+
+        for line in text.splitlines():
+
+            line = line.strip()
+
+            if not line:
+                continue
+
+            lower = line.lower()
+
+            should_skip = False
+
+            for prefix in skip_starts:
+
+                if lower.startswith(prefix):
+
+                    should_skip = True
+
+                    break
+
+            if not should_skip:
+
+                cleaned.append(line)
+
+        result = "\n".join(cleaned)
+
+        return result.strip()
+
+    except Exception as e:
+
+        return (
+            f"# ERROR\n"
+            f"# {str(e)}"
+        )

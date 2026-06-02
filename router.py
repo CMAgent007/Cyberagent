@@ -1,6 +1,8 @@
 from tool_registry import registry
+
 from tools.file_agent import execute_file_action
 from tools.agent_builder import create_python_script
+from tools.learning import learn_file
 
 
 def execute_plan(plan):
@@ -11,7 +13,9 @@ def execute_plan(plan):
 
     tool = plan.get("tool")
 
-    # Shell
+    # --------------------
+    # SHELL
+    # --------------------
 
     if tool == "shell":
 
@@ -22,7 +26,9 @@ def execute_plan(plan):
 
         return result
 
-    # File
+    # --------------------
+    # FILES
+    # --------------------
 
     if tool == "file":
 
@@ -35,7 +41,9 @@ def execute_plan(plan):
             )
         )
 
-    # Python
+    # --------------------
+    # PYTHON
+    # --------------------
 
     if tool == "python":
 
@@ -46,12 +54,28 @@ def execute_plan(plan):
 
         return result
 
-    # Builder
+    # --------------------
+    # SCRIPT BUILDER
+    # --------------------
 
     if tool == "builder":
 
         return create_python_script(
             plan["prompt"]
         )
+
+    # --------------------
+    # LEARNING
+    # --------------------
+
+    if tool == "learning":
+
+        return learn_file(
+            plan["path"]
+        )
+
+    # --------------------
+    # UNKNOWN
+    # --------------------
 
     return "Unknown plan"
