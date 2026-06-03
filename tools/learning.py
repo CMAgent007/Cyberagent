@@ -1,6 +1,5 @@
 import os
-
-from tools.summarizer import summarize_text
+import shutil
 
 
 def learn_file(path):
@@ -11,18 +10,6 @@ def learn_file(path):
 
     try:
 
-        with open(
-            path,
-            "r",
-            encoding="utf-8"
-        ) as f:
-
-            content = f.read()
-
-        summary = summarize_text(
-            content
-        )
-
         filename = os.path.basename(path)
 
         output = os.path.join(
@@ -30,16 +17,18 @@ def learn_file(path):
             filename
         )
 
-        with open(
-            output,
-            "w",
-            encoding="utf-8"
-        ) as f:
+        os.makedirs(
+            "knowledge",
+            exist_ok=True
+        )
 
-            f.write(summary)
+        shutil.copy2(
+            path,
+            output
+        )
 
         return (
-            f"Learned and summarized: {output}"
+            f"Learned: {output}"
         )
 
     except Exception as e:

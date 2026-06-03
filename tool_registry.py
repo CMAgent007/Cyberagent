@@ -65,11 +65,19 @@ class ToolRegistry:
 
 registry = ToolRegistry()
 
+# --------------------
+# SHELL
+# --------------------
+
 registry.register(
     "shell",
     "tools.shell",
     "run_command"
 )
+
+# --------------------
+# PYTHON
+# --------------------
 
 registry.register(
     "python",
@@ -77,8 +85,28 @@ registry.register(
     "run_python_file"
 )
 
+# --------------------
+# SMART REPAIR
+# --------------------
+
 registry.register(
     "smart_repair",
     "tools.smart_repair",
     "repair_last_file"
+)
+
+# --------------------
+# CONTEXT TOOLS
+# --------------------
+
+registry.register(
+    "current_file",
+    "tools.context_tools",
+    "current_file"
+)
+
+registry.register(
+    "clear_current_file",
+    "tools.context_tools",
+    "clear_current_file"
 )

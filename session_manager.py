@@ -64,6 +64,22 @@ def get_context(key):
     return data.get(key)
 
 
+def remove_context(key):
+
+    data = load_session()
+
+    if key in data:
+
+        del data[key]
+
+        save_session(data)
+
+
 def clear_context():
 
     save_session({})
+
+
+def get_all_context():
+
+    return load_session()

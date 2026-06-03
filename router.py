@@ -67,6 +67,30 @@ def execute_plan(plan):
         return result
 
     # --------------------
+    # CURRENT FILE
+    # --------------------
+
+    if tool == "current_file":
+
+        success, result = registry.execute(
+            "current_file"
+        )
+
+        return result
+
+    # --------------------
+    # CLEAR CURRENT FILE
+    # --------------------
+
+    if tool == "clear_current_file":
+
+        success, result = registry.execute(
+            "clear_current_file"
+        )
+
+        return result
+
+    # --------------------
     # SCRIPT BUILDER
     # --------------------
 

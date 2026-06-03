@@ -45,6 +45,18 @@ def plan(user_input):
     # CONTEXT COMMANDS
     # --------------------
 
+    if text == "what is my current file":
+
+        return {
+            "tool": "current_file"
+        }
+
+    if text == "clear current file":
+
+        return {
+            "tool": "clear_current_file"
+        }
+
     if text == "run it":
 
         last_file = get_context(
@@ -181,5 +193,9 @@ def plan(user_input):
             "tool": "learning",
             "path": match.group(1).strip()
         }
+
+    # --------------------
+    # NO TOOL FOUND
+    # --------------------
 
     return None

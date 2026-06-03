@@ -5,16 +5,20 @@ KNOWLEDGE_DIR = "knowledge"
 
 def search_knowledge(query):
 
-    query = query.lower()
+    query = query.lower().strip()
 
     if not os.path.exists(KNOWLEDGE_DIR):
+
         return None
 
     results = []
 
     for filename in os.listdir(KNOWLEDGE_DIR):
 
-        if not filename.endswith(".md"):
+        if not (
+            filename.endswith(".txt")
+            or filename.endswith(".md")
+        ):
             continue
 
         filepath = os.path.join(
@@ -34,23 +38,29 @@ def search_knowledge(query):
 
             text = content.lower()
 
-            words = query.split()
+            matches = []
 
-            for word in words:
+            for word in query.split():
 
                 if len(word) < 3:
                     continue
 
                 if word in text:
 
-                    results.append(content)
+                    matches.append(word)
 
-                    break
+            if matches:
+
+                results.append(
+                    f"File: {filename}\n\n{content}"
+                )
 
         except Exception:
+
             pass
 
     if not results:
+
         return None
 
-    return "\n\n".join(results)
+    return "\n\n" + ("\n" + ("-" * 50) + "\n\n").join(results)
