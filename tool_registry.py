@@ -76,3 +76,9 @@ registry.register(
     "tools.python_tool",
     "run_python_file"
 )
+
+registry.register(
+    "smart_repair",
+    "tools.smart_repair",
+    "repair_last_file"
+)

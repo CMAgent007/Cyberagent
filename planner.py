@@ -42,7 +42,7 @@ def plan(user_input):
         }
 
     # --------------------
-    # CONTEXT: RUN IT
+    # CONTEXT COMMANDS
     # --------------------
 
     if text == "run it":
@@ -58,10 +58,6 @@ def plan(user_input):
                 "path": last_file
             }
 
-    # --------------------
-    # CONTEXT: READ IT
-    # --------------------
-
     if text == "read it":
 
         last_file = get_context(
@@ -75,6 +71,12 @@ def plan(user_input):
                 "action": "read",
                 "path": last_file
             }
+
+    if text == "fix it":
+
+        return {
+            "tool": "smart_repair"
+        }
 
     # --------------------
     # FILE READ
@@ -179,9 +181,5 @@ def plan(user_input):
             "tool": "learning",
             "path": match.group(1).strip()
         }
-
-    # --------------------
-    # NO TOOL FOUND
-    # --------------------
 
     return None

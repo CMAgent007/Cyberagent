@@ -55,6 +55,18 @@ def execute_plan(plan):
         return result
 
     # --------------------
+    # SMART REPAIR
+    # --------------------
+
+    if tool == "smart_repair":
+
+        success, result = registry.execute(
+            "smart_repair"
+        )
+
+        return result
+
+    # --------------------
     # SCRIPT BUILDER
     # --------------------
 
