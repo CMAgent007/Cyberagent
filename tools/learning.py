@@ -1,5 +1,7 @@
 import os
 
+from tools.summarizer import summarize_text
+
 
 def learn_file(path):
 
@@ -17,6 +19,10 @@ def learn_file(path):
 
             content = f.read()
 
+        summary = summarize_text(
+            content
+        )
+
         filename = os.path.basename(path)
 
         output = os.path.join(
@@ -30,10 +36,10 @@ def learn_file(path):
             encoding="utf-8"
         ) as f:
 
-            f.write(content)
+            f.write(summary)
 
         return (
-            f"Learned: {output}"
+            f"Learned and summarized: {output}"
         )
 
     except Exception as e:

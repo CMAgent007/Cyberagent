@@ -1,5 +1,7 @@
 import re
 
+from session_manager import get_context
+
 
 def plan(user_input):
 
@@ -38,6 +40,41 @@ def plan(user_input):
             "tool": "shell",
             "command": "date"
         }
+
+    # --------------------
+    # CONTEXT: RUN IT
+    # --------------------
+
+    if text == "run it":
+
+        last_file = get_context(
+            "last_file"
+        )
+
+        if last_file:
+
+            return {
+                "tool": "python",
+                "path": last_file
+            }
+
+    # --------------------
+    # CONTEXT: READ IT
+    # --------------------
+
+    if text == "read it":
+
+        last_file = get_context(
+            "last_file"
+        )
+
+        if last_file:
+
+            return {
+                "tool": "file",
+                "action": "read",
+                "path": last_file
+            }
 
     # --------------------
     # FILE READ

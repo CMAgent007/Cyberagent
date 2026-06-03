@@ -1,5 +1,5 @@
 from tools.script_builder import build_script
-import re
+from session_manager import set_context
 
 
 def create_python_script(prompt):
@@ -33,5 +33,12 @@ def create_python_script(prompt):
         prompt,
         path
     )
+
+    if result.startswith("Saved"):
+
+        set_context(
+            "last_file",
+            path
+        )
 
     return result

@@ -1,0 +1,9 @@
+Linux is an open-source operating system.
+
+The Linux kernel manages hardware resources.
+
+Linux supports multiuser and multitasking environments.
+
+Linux distributions include Debian, Ubuntu, Fedora and Arch Linux.
+
+Linux is widely used in servers, cloud environments and cybersecurity.
