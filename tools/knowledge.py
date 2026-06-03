@@ -1,4 +1,5 @@
 import os
+import re
 
 KNOWLEDGE_DIR = "knowledge"
 
@@ -40,7 +41,12 @@ def search_knowledge(query):
 
             matches = []
 
-            for word in query.split():
+            for word in re.findall(
+                r"\b[a-zA-Z0-9]+\b",
+                query
+            ):
+
+                word = word.lower()
 
                 if len(word) < 3:
                     continue
@@ -63,4 +69,6 @@ def search_knowledge(query):
 
         return None
 
-    return "\n\n" + ("\n" + ("-" * 50) + "\n\n").join(results)
+    return "\n\n" + (
+        "\n" + ("-" * 50) + "\n\n"
+    ).join(results)
